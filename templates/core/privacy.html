@@ -1,0 +1,720 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Politique de confidentialité - MICI | Protection de vos données{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .privacy-header {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        padding: 4rem 0;
+        margin-bottom: 4rem;
+        text-align: center;
+        border-radius: 0 0 30px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .privacy-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(144, 198, 149, 0.15), transparent);
+        border-radius: 50%;
+    }
+    
+    .privacy-header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .privacy-header-icon {
+        font-size: 3.5rem;
+        color: var(--primary-green);
+        margin-bottom: 1.5rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .privacy-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .privacy-header p {
+        font-size: 1.2rem;
+        color: var(--text-medium);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    /* Last Updated Badge */
+    .last-updated {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        color: var(--white);
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    /* Privacy Card */
+    .privacy-card {
+        border: none;
+        border-radius: 25px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        background: var(--white);
+        margin-bottom: 3rem;
+    }
+    
+    .privacy-card-body {
+        padding: 3.5rem;
+    }
+    
+    /* Table of Contents */
+    .toc {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(144, 198, 149, 0.05));
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 3rem;
+        border-left: 4px solid var(--primary-orange);
+    }
+    
+    .toc-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .toc-title i {
+        color: var(--primary-orange);
+    }
+    
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .toc-item {
+        margin-bottom: 1rem;
+    }
+    
+    .toc-link {
+        color: var(--text-dark);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+    
+    .toc-link:hover {
+        background: var(--white);
+        color: var(--primary-orange);
+        transform: translateX(5px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .toc-link i {
+        color: var(--primary-green);
+        font-size: 0.9rem;
+    }
+    
+    /* Section Styles */
+    .privacy-section {
+        margin-bottom: 3.5rem;
+        scroll-margin-top: 100px;
+    }
+    
+    .section-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-content {
+        color: var(--text-medium);
+        font-size: 1.05rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-content ul {
+        margin: 1.5rem 0;
+        padding-left: 0;
+        list-style: none;
+    }
+    
+    .section-content li {
+        position: relative;
+        padding-left: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.7;
+    }
+    
+    .section-content li::before {
+        content: '\f00c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--primary-green);
+        font-size: 1.1rem;
+        width: 30px;
+        height: 30px;
+        background: rgba(144, 198, 149, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Highlight Box */
+    .highlight-box {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.08), rgba(144, 198, 149, 0.08));
+        border-left: 4px solid var(--primary-orange);
+        padding: 1.8rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+    }
+    
+    .highlight-box-title {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.2rem;
+    }
+    
+    .highlight-box-title i {
+        color: var(--primary-orange);
+        font-size: 1.3rem;
+    }
+    
+    .highlight-box-content {
+        color: var(--text-medium);
+        line-height: 1.7;
+        margin: 0;
+    }
+    
+    /* Contact CTA */
+    .contact-cta {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        padding: 3rem;
+        border-radius: 20px;
+        text-align: center;
+        margin-top: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .contact-cta::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+        border-radius: 50%;
+    }
+    
+    .contact-cta-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .contact-cta h3 {
+        color: var(--white);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-cta p {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-cta-white {
+        background: var(--white);
+        color: var(--primary-orange);
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-cta-white:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+        color: var(--primary-orange);
+    }
+    
+    /* Info Cards */
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+    }
+    
+    .info-card {
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 2px solid transparent;
+        text-align: center;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-orange);
+    }
+    
+    .info-card-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 4px 16px rgba(255, 140, 66, 0.3);
+    }
+    
+    .info-card-icon i {
+        font-size: 2rem;
+        color: var(--white);
+    }
+    
+    .info-card-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.8rem;
+    }
+    
+    .info-card-text {
+        color: var(--text-medium);
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .privacy-header {
+            padding: 3rem 0;
+        }
+        
+        .privacy-header h1 {
+            font-size: 2.2rem;
+        }
+        
+        .privacy-header p {
+            font-size: 1rem;
+        }
+        
+        .privacy-card-body {
+            padding: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .section-number {
+            margin-bottom: 0.8rem;
+        }
+        
+        .toc {
+            padding: 1.5rem;
+        }
+        
+        .contact-cta {
+            padding: 2rem;
+        }
+        
+        .contact-cta h3 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="privacy-header">
+    <div class="container">
+        <div class="privacy-header-content">
+            <div class="privacy-header-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1>Politique de confidentialité</h1>
+            <p>
+                Votre vie privée est importante pour nous. Découvrez comment nous protégeons vos données personnelles.
+            </p>
+            <span class="last-updated">
+                <i class="fas fa-calendar-check"></i> Dernière mise à jour : {% now "d F Y" %}
+            </span>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h4 class="info-card-title">Données sécurisées</h4>
+                    <p class="info-card-text">Vos informations sont protégées par des mesures de sécurité avancées</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h4 class="info-card-title">Confidentialité</h4>
+                    <p class="info-card-text">Nous ne partageons jamais vos données personnelles avec des tiers</p>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h4 class="info-card-title">Contrôle total</h4>
+                    <p class="info-card-text">Vous pouvez accéder, modifier ou supprimer vos données à tout moment</p>
+                </div>
+            </div>
+            
+            <div class="privacy-card">
+                <div class="privacy-card-body">
+                    <!-- Table of Contents -->
+                    <div class="toc">
+                        <h2 class="toc-title">
+                            <i class="fas fa-list"></i>
+                            Sommaire
+                        </h2>
+                        <ul class="toc-list">
+                            <li class="toc-item">
+                                <a href="#section-1" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    1. Collecte des informations
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-2" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    2. Utilisation des informations
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-3" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    3. Protection des données
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-4" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    4. Partage des informations
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-5" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    5. Cookies et technologies
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-6" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    6. Vos droits
+                                </a>
+                            </li>
+                            <li class="toc-item">
+                                <a href="#section-7" class="toc-link">
+                                    <i class="fas fa-chevron-right"></i>
+                                    7. Modifications de la politique
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Section 1 -->
+                    <section id="section-1" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">1</span>
+                            Collecte des informations
+                        </h2>
+                        <p class="section-content">
+                            Nous collectons les informations que vous nous fournissez volontairement lorsque vous interagissez avec notre plateforme. Ces données nous permettent de vous offrir une expérience personnalisée et de qualité.
+                        </p>
+                        <div class="highlight-box">
+                            <h4 class="highlight-box-title">
+                                <i class="fas fa-info-circle"></i>
+                                Informations collectées
+                            </h4>
+                            <p class="highlight-box-content">
+                                Lors de votre inscription, nous collectons : votre nom d'utilisateur, votre adresse email, votre photo de profil (optionnelle), et les contenus que vous publiez (articles, commentaires).
+                            </p>
+                        </div>
+                    </section>
+                    
+                    <!-- Section 2 -->
+                    <section id="section-2" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">2</span>
+                            Utilisation des informations
+                        </h2>
+                        <p class="section-content">
+                            Les informations collectées sont utilisées exclusivement pour améliorer votre expérience sur notre plateforme et vous fournir les services que vous attendez.
+                        </p>
+                        <ul class="section-content">
+                            <li>Gérer et sécuriser votre compte utilisateur</li>
+                            <li>Vous permettre de publier des articles et des commentaires</li>
+                            <li>Vous contacter concernant votre compte, nos services ou des mises à jour importantes</li>
+                            <li>Améliorer notre site web, nos fonctionnalités et nos services</li>
+                            <li>Assurer la modération et le respect de nos conditions d'utilisation</li>
+                            <li>Envoyer des notifications relatives à votre activité (si vous y avez consenti)</li>
+                        </ul>
+                    </section>
+                    
+                    <!-- Section 3 -->
+                    <section id="section-3" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">3</span>
+                            Protection des données
+                        </h2>
+                        <p class="section-content">
+                            La sécurité de vos données personnelles est notre priorité absolue. Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées pour protéger vos informations contre tout accès non autorisé, toute modification, divulgation ou destruction.
+                        </p>
+                        <div class="highlight-box">
+                            <h4 class="highlight-box-title">
+                                <i class="fas fa-shield-alt"></i>
+                                Nos mesures de sécurité
+                            </h4>
+                            <p class="highlight-box-content">
+                                Nous utilisons le chiffrement SSL/TLS pour sécuriser les transmissions de données, des mots de passe cryptés, des pare-feu avancés, et des audits de sécurité réguliers pour garantir la protection maximale de vos informations.
+                            </p>
+                        </div>
+                    </section>
+                    
+                    <!-- Section 4 -->
+                    <section id="section-4" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">4</span>
+                            Partage des informations
+                        </h2>
+                        <p class="section-content">
+                            Nous respectons votre vie privée et ne vendons, n'échangeons ni ne louons vos informations personnelles à des tiers à des fins commerciales. Vos données sont uniquement utilisées dans le cadre de notre plateforme et pour les finalités décrites dans cette politique.
+                        </p>
+                        <p class="section-content">
+                            Les seules exceptions à cette règle concernent les cas où la loi nous y oblige ou lorsque cela est nécessaire pour protéger nos droits légaux.
+                        </p>
+                    </section>
+                    
+                    <!-- Section 5 -->
+                    <section id="section-5" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">5</span>
+                            Cookies et technologies
+                        </h2>
+                        <p class="section-content">
+                            Notre site utilise des cookies et des technologies similaires pour améliorer votre expérience de navigation, analyser l'utilisation du site et personnaliser le contenu.
+                        </p>
+                        <ul class="section-content">
+                            <li>Cookies essentiels : nécessaires au fonctionnement du site</li>
+                            <li>Cookies de performance : pour analyser l'utilisation du site</li>
+                            <li>Cookies de préférences : pour mémoriser vos choix et paramètres</li>
+                        </ul>
+                        <p class="section-content">
+                            Vous pouvez désactiver les cookies dans les paramètres de votre navigateur, mais cela peut affecter certaines fonctionnalités du site.
+                        </p>
+                    </section>
+                    
+                    <!-- Section 6 -->
+                    <section id="section-6" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">6</span>
+                            Vos droits
+                        </h2>
+                        <p class="section-content">
+                            Conformément aux réglementations sur la protection des données, vous disposez de plusieurs droits concernant vos informations personnelles :
+                        </p>
+                        <ul class="section-content">
+                            <li><strong>Droit d'accès :</strong> Vous pouvez demander une copie de vos données personnelles</li>
+                            <li><strong>Droit de rectification :</strong> Vous pouvez modifier vos informations incorrectes ou incomplètes</li>
+                            <li><strong>Droit de suppression :</strong> Vous pouvez demander la suppression de votre compte et de vos données</li>
+                            <li><strong>Droit d'opposition :</strong> Vous pouvez vous opposer au traitement de vos données</li>
+                            <li><strong>Droit à la portabilité :</strong> Vous pouvez récupérer vos données dans un format structuré</li>
+                        </ul>
+                        <p class="section-content">
+                            Pour exercer ces droits, contactez-nous via notre formulaire de contact.
+                        </p>
+                    </section>
+                    
+                    <!-- Section 7 -->
+                    <section id="section-7" class="privacy-section">
+                        <h2 class="section-title">
+                            <span class="section-number">7</span>
+                            Modifications de la politique
+                        </h2>
+                        <p class="section-content">
+                            Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment pour refléter les changements dans nos pratiques ou pour des raisons opérationnelles, légales ou réglementaires.
+                        </p>
+                        <p class="section-content">
+                            Toute modification sera publiée sur cette page avec une nouvelle date de mise à jour. Nous vous encourageons à consulter régulièrement cette politique pour rester informé de la manière dont nous protégeons vos informations.
+                        </p>
+                        <div class="highlight-box">
+                            <h4 class="highlight-box-title">
+                                <i class="fas fa-bell"></i>
+                                Notifications des modifications
+                            </h4>
+                            <p class="highlight-box-content">
+                                En cas de changements majeurs, nous vous en informerons par email ou via une notification sur le site.
+                            </p>
+                        </div>
+                    </section>
+                    
+                    <!-- Contact CTA -->
+                    <div class="contact-cta">
+                        <div class="contact-cta-content">
+                            <h3><i class="fas fa-question-circle"></i> Des questions sur vos données ?</h3>
+                            <p>
+                                Notre équipe est à votre disposition pour répondre à toutes vos questions concernant la protection de vos données personnelles.
+                            </p>
+                            <a href="{% url 'core:contact' %}" class="btn btn-cta-white">
+                                <i class="fas fa-envelope"></i>
+                                Nous contacter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scroll for TOC links
+        document.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Highlight the section temporarily
+                    targetSection.style.transition = 'background-color 0.3s';
+                    targetSection.style.backgroundColor = 'rgba(255, 140, 66, 0.1)';
+                    setTimeout(() => {
+                        targetSection.style.backgroundColor = 'transparent';
+                    }, 1500);
+                }
+            });
+        });
+        
+        // Active TOC link on scroll
+        const sections = document.querySelectorAll('.privacy-section');
+        const tocLinks = document.querySelectorAll('.toc-link');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                    link.style.color = 'var(--primary-orange)';
+                    link.style.fontWeight = '700';
+                } else {
+                    link.style.color = '';
+                    link.style.fontWeight = '500';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

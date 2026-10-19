@@ -1,0 +1,762 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - MICI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Article Container */
+    .article-container {
+        margin-top: 3rem;
+        margin-bottom: 4rem;
+    }
+    
+    /* Article Header */
+    .article-header {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        padding: 3rem;
+        border-radius: 25px 25px 0 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .article-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 140, 66, 0.1), transparent);
+        border-radius: 50%;
+    }
+    
+    .article-header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .article-category {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    /* Article Card */
+    .article-card {
+        border: none;
+        border-radius: 25px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        background: var(--white);
+        margin-bottom: 3rem;
+    }
+    
+    .article-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        max-height: 500px;
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+    }
+    
+    .article-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .article-card:hover .article-image {
+        transform: scale(1.05);
+    }
+    
+    .article-body {
+        padding: 3rem;
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 2rem;
+        line-height: 1.3;
+    }
+    
+    /* Article Meta */
+    .article-meta {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        padding: 1.5rem 0;
+        border-top: 2px solid var(--border-color);
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 2.5rem;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--text-medium);
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    .meta-item i {
+        color: var(--primary-green);
+        font-size: 1.1rem;
+    }
+    
+    .meta-item strong {
+        color: var(--text-dark);
+    }
+    
+    .likes-badge {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        color: var(--primary-orange);
+    }
+    
+    /* Article Content */
+    .article-content {
+        font-size: 1.15rem;
+        line-height: 1.9;
+        color: var(--text-dark);
+        margin-bottom: 3rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-content h2,
+    .article-content h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
+    
+    .article-content ul,
+    .article-content ol {
+        margin: 1.5rem 0;
+        padding-left: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.8rem;
+    }
+    
+    /* Article Actions */
+    .article-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 2rem 0;
+        border-top: 2px solid var(--border-color);
+    }
+    
+    .like-button {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+        cursor: pointer;
+    }
+    
+    .like-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+    }
+    
+    .like-button.liked {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        animation: heartBeat 0.5s ease;
+    }
+    
+    .like-button.liked:hover {
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+    
+    @keyframes heartBeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.2); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .like-button i {
+        font-size: 1.3rem;
+        transition: transform 0.3s;
+    }
+    
+    .like-button:hover i {
+        transform: scale(1.2);
+    }
+    
+    /* Admin Actions */
+    .admin-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        padding: 0.8rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        border: none;
+        box-shadow: 0 4px 12px rgba(144, 198, 149, 0.3);
+    }
+    
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(144, 198, 149, 0.4);
+        color: var(--white);
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: var(--white);
+        border: none;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+        color: var(--white);
+    }
+    
+    /* Comments Section */
+    .comments-section {
+        border: none;
+        border-radius: 25px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        background: var(--white);
+    }
+    
+    .comments-header {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        padding: 2rem 3rem;
+        color: var(--white);
+    }
+    
+    .comments-header h3 {
+        color: var(--white);
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .comments-count {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 1rem;
+    }
+    
+    .comments-body {
+        padding: 3rem;
+    }
+    
+    /* Comment Form */
+    .comment-form {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(144, 198, 149, 0.05));
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 3rem;
+    }
+    
+    .comment-form textarea {
+        border: 2px solid var(--border-color);
+        border-radius: 15px;
+        padding: 1.2rem;
+        font-size: 1rem;
+        transition: var(--transition);
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .comment-form textarea:focus {
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.1);
+        outline: none;
+    }
+    
+    .btn-comment {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    .btn-comment:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+        color: var(--white);
+    }
+    
+    /* Comment Card */
+    .comment-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        background: var(--white);
+    }
+    
+    .comment-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateX(5px);
+    }
+    
+    .comment-card-body {
+        padding: 2rem;
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .comment-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    
+    .comment-info h6 {
+        margin: 0 0 0.3rem;
+        color: var(--text-dark);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .comment-date {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    .comment-date i {
+        color: var(--primary-green);
+    }
+    
+    .comment-content {
+        color: var(--text-medium);
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+    
+    .btn-delete-comment {
+        background: transparent;
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+    
+    .btn-delete-comment:hover {
+        background: #dc3545;
+        color: var(--white);
+        transform: scale(1.05);
+    }
+    
+    /* Empty State */
+    .empty-comments {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-light);
+    }
+    
+    .empty-comments i {
+        font-size: 4rem;
+        color: var(--primary-orange);
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-comments p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    /* Login Alert */
+    .login-alert {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        border: 2px solid var(--primary-orange);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-alert a {
+        color: var(--primary-orange);
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .login-alert a:hover {
+        color: var(--dark-orange);
+        text-decoration: underline;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .article-header {
+            padding: 2rem;
+        }
+        
+        .article-body {
+            padding: 2rem;
+        }
+        
+        .article-title {
+            font-size: 2rem;
+        }
+        
+        .article-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .article-content {
+            font-size: 1.05rem;
+        }
+        
+        .article-actions {
+            flex-direction: column;
+        }
+        
+        .like-button,
+        .btn-edit,
+        .btn-delete {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .comments-body {
+            padding: 2rem;
+        }
+        
+        .comment-form {
+            padding: 1.5rem;
+        }
+        
+        .comment-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container article-container">
+    <div class="row">
+        <div class="col-lg-9 mx-auto">
+            <!-- Article -->
+            <article class="article-card">
+                {% if post.image %}
+                    <div class="article-image-wrapper">
+                        <img src="{{ post.image.url }}" class="article-image" alt="{{ post.title }}">
+                    </div>
+                {% endif %}
+                
+                <div class="article-body">
+                    <div class="article-header">
+                        <div class="article-header-content">
+                            <span class="article-category">
+                                <i class="fas fa-bookmark"></i> Article
+                            </span>
+                            <h1 class="article-title">{{ post.title }}</h1>
+                        </div>
+                    </div>
+                    
+                    <div class="article-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-user-circle"></i>
+                            Par <strong>{{ post.author.username }}</strong>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ post.created_at|date:"d M Y à H:i" }}
+                        </div>
+                        {% if post.updated_at != post.created_at %}
+                            <div class="meta-item">
+                                <i class="fas fa-edit"></i>
+                                Modifié le {{ post.updated_at|date:"d M Y" }}
+                            </div>
+                        {% endif %}
+                        <div class="meta-item">
+                            <span class="likes-badge">
+                                <i class="fas fa-heart"></i>
+                                <span id="likes-count">{{ post.get_likes_count }}</span> J'aime
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-content">
+                        {{ post.content|linebreaks|safe }}
+                    </div>
+                    
+                    <div class="article-actions">
+                        {% if user.is_authenticated %}
+                            <button class="like-button {% if is_liked %}liked{% endif %}" 
+                                    id="like-btn" 
+                                    data-slug="{{ post.slug }}"
+                                    data-liked="{% if is_liked %}true{% else %}false{% endif %}">
+                                <i class="fas fa-heart"></i>
+                                <span id="like-text">{% if is_liked %}J'adore{% else %}J'aime{% endif %}</span>
+                            </button>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="like-button">
+                                <i class="fas fa-heart"></i>
+                                Connectez-vous pour aimer
+                            </a>
+                        {% endif %}
+                        
+                        {% if user.is_admin_user or post.author == user %}
+                            <div class="admin-actions w-100">
+                                <a href="{% url 'blog:post_edit' post.slug %}" class="btn-edit">
+                                    <i class="fas fa-edit"></i> Modifier l'article
+                                </a>
+                                <a href="{% url 'blog:post_delete' post.slug %}" 
+                                   class="btn-delete"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <div class="comments-header">
+                    <h3>
+                        <i class="fas fa-comments"></i>
+                        Commentaires
+                        <span class="comments-count">{{ comments.count }}</span>
+                    </h3>
+                </div>
+                
+                <div class="comments-body">
+                    <!-- Comment Form -->
+                    {% if user.is_authenticated %}
+                        <form method="post" class="comment-form">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-comment-dots"></i>
+                                    Ajouter votre commentaire
+                                </label>
+                                {{ form.content }}
+                                {% if form.content.errors %}
+                                    <div class="text-danger mt-2">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{ form.content.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn-comment">
+                                <i class="fas fa-paper-plane"></i>
+                                Publier le commentaire
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="login-alert">
+                            <i class="fas fa-info-circle"></i>
+                            <a href="{% url 'accounts:login' %}">Connectez-vous</a> pour ajouter un commentaire et participer à la discussion.
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Comments List -->
+                    {% if comments %}
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                                <div class="comment-card">
+                                    <div class="comment-card-body">
+                                        <div class="comment-header">
+                                            <div class="comment-author">
+                                                <div class="comment-avatar">
+                                                    {{ comment.user.username|first|upper }}
+                                                </div>
+                                                <div class="comment-info">
+                                                    <h6>{{ comment.user.username }}</h6>
+                                                    <div class="comment-date">
+                                                        <i class="fas fa-clock"></i>
+                                                        {{ comment.created_at|date:"d M Y à H:i" }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% if user.is_admin_user or comment.user == user %}
+                                                <a href="{% url 'blog:comment_delete' comment.id %}" 
+                                                   class="btn-delete-comment"
+                                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
+                                                    <i class="fas fa-trash"></i> Supprimer
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="comment-content">
+                                            {{ comment.content|linebreaks }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-comments">
+                            <i class="fas fa-comment-slash"></i>
+                            <p>Aucun commentaire pour le moment. Soyez le premier à commenter !</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Fonctionnalité de like avec AJAX
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    $(document).ready(function() {
+        $('#like-btn').click(function() {
+            var slug = $(this).data('slug');
+            var csrftoken = getCookie('csrftoken');
+            var button = $(this);
+            
+            // Add loading state
+            button.prop('disabled', true);
+            button.html('<i class="fas fa-spinner fa-spin"></i> <span>Chargement...</span>');
+            
+            $.ajax({
+                url: '/blog/post/' + slug + '/like/',
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function(data) {
+                    $('#likes-count').text(data.likes_count);
+                    button.data('liked', data.liked);
+                    
+                    if (data.liked) {
+                        button.addClass('liked');
+                        button.html('<i class="fas fa-heart"></i> <span id="like-text">J\'adore</span>');
+                    } else {
+                        button.removeClass('liked');
+                        button.html('<i class="fas fa-heart"></i> <span id="like-text">J\'aime</span>');
+                    }
+                    
+                    button.prop('disabled', false);
+                },
+                error: function() {
+                    alert('Une erreur est survenue. Veuillez réessayer.');
+                    button.prop('disabled', false);
+                    button.html('<i class="fas fa-heart"></i> <span id="like-text">J\'aime</span>');
+                }
+            });
+        });
+        
+        // Auto-resize comment textarea
+        const textarea = document.querySelector('.comment-form textarea');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+        
+        // Smooth scroll to comments on page load if hash is present
+        if (window.location.hash === '#comments') {
+            setTimeout(() => {
+                document.querySelector('.comments-section').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}

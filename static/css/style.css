@@ -1,0 +1,9 @@
+.hero-section {
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 1s ease-in-out; /* Animation douce */
+
+
+}

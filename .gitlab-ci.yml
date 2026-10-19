@@ -1,0 +1,54 @@
+image: docker:20.10.16
+
+services:
+  - docker:20.10.16-dind
+
+stages:
+  - build-image-uat
+  - deploy-image-uat 
+
+before_script:
+  - echo "${CI_REGISTRY_PASSWORD}" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+
+build-image-uat-job:
+  stage: build-image-uat
+  only:
+    refs:
+      - develop
+  script:
+    - IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - docker build -t ${CI_REGISTRY_IMAGE}:${IMAGE_TAG} .
+    - docker push ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}
+
+#Job Gitops Gitlab-ci 
+
+deploy-image-uat:
+  stage: deploy-image-uat
+  dependencies:
+    - build-image-uat-job
+  variables:
+    HELM_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+  only:
+    refs:
+      - develop
+  before_script:
+    - apk add --no-cache git #installer git
+  script:
+    - |
+      echo "Configuration de Git pour GitOps"
+      git config --global user.email "gitops@gitops.com"
+      git config --global user.name "gitops"
+      echo "Récupération et mise à jour de la branche Helm"
+      git fetch || (echo "Failed to fetch" && exit 1)
+      git checkout -f helm_dev|| (echo "Failed to checkout helm_dev" && exit 1)
+      echo "Mise à jour de l'image Docker dans le fichier Helm"
+      sed -i "/image\.tag/{n;s/.*/                  value: $HELM_IMAGE_TAG/}" helm/mici/templates/Application_mici.yaml
+      git add helm/mici/templates/Application_mici.yaml
+      git commit -m "Mise à jour de l'image Docker pour :
+      Branche  : $CI_COMMIT_BRANCH
+      Auteur   : $CI_COMMIT_AUTHOR
+      Temps    : $CI_COMMIT_TIMESTAMP
+      Message  : $CI_COMMIT_MESSAGE
+      Changement : https://gitlab.com/-/ide/angecedricnda6-group/mici.git/-/commit/$CI_COMMIT_SHA" || echo "No changes to commit"
+      echo "Poussée des modifications vers la branche GitOps"
+      git push https://$GITOPS_USERNAME:$GITOPS_PASSWORD@gitlab.com/angecedricnda6-group/mici.git HEAD:helm_dev|| (echo "Failed to push changes" && exit 1)

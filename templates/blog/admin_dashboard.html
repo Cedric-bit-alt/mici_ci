@@ -1,0 +1,798 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord Admin - MICI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Container */
+    .dashboard-container {
+        margin-top: 3rem;
+        margin-bottom: 4rem;
+    }
+    
+    /* Dashboard Header */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        padding: 3rem;
+        border-radius: 25px;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+        border-radius: 50%;
+    }
+    
+    .dashboard-header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-header h1 {
+        color: var(--white);
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 0.8rem;
+        text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dashboard-header p {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    
+    .dashboard-icon {
+        font-size: 3rem;
+        color: var(--white);
+        margin-bottom: 1rem;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-green));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--primary-orange);
+    }
+    
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: var(--white);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card.posts .stat-icon {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+    
+    .stat-card.comments .stat-icon {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+    
+    .stat-card.likes .stat-icon {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+    
+    .stat-card.users .stat-icon {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--text-medium);
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Quick Actions Card */
+    .quick-actions-card {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(144, 198, 149, 0.05));
+        border: none;
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .quick-actions-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .quick-actions-title i {
+        color: var(--primary-orange);
+    }
+    
+    .quick-actions-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .btn-quick-action {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    .btn-quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+        color: var(--white);
+    }
+    
+    .btn-quick-action.secondary {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        box-shadow: 0 4px 12px rgba(144, 198, 149, 0.3);
+    }
+    
+    .btn-quick-action.secondary:hover {
+        box-shadow: 0 6px 20px rgba(144, 198, 149, 0.4);
+    }
+    
+    .pending-badge {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: var(--white);
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    /* Section Cards */
+    .section-card {
+        background: var(--white);
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 3rem;
+        overflow: hidden;
+    }
+    
+    .section-header {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        padding: 1.8rem 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .section-title {
+        color: var(--white);
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .section-count {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.95rem;
+    }
+    
+    .section-body {
+        padding: 2.5rem;
+    }
+    
+    /* Table Styles */
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 15px;
+    }
+    
+    .custom-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .custom-table thead {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+    }
+    
+    .custom-table thead th {
+        padding: 1.2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .custom-table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+    
+    .custom-table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.03), rgba(144, 198, 149, 0.03));
+    }
+    
+    .custom-table tbody td {
+        padding: 1.2rem;
+        vertical-align: middle;
+        color: var(--text-medium);
+    }
+    
+    .custom-table tbody td a {
+        color: var(--primary-orange);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    .custom-table tbody td a:hover {
+        color: var(--dark-orange);
+        text-decoration: underline;
+    }
+    
+    .table-empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+    }
+    
+    .table-empty i {
+        font-size: 3rem;
+        color: var(--primary-orange);
+        opacity: 0.3;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    /* Action Buttons */
+    .btn-table-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-table-edit {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        box-shadow: 0 2px 8px rgba(144, 198, 149, 0.3);
+    }
+    
+    .btn-table-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(144, 198, 149, 0.4);
+        color: var(--white);
+    }
+    
+    .btn-table-delete {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: var(--white);
+        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
+    
+    .btn-table-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+        color: var(--white);
+    }
+    
+    /* Badges */
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+    
+    .status-badge.approved {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+    }
+    
+    .status-badge.pending {
+        background: linear-gradient(135deg, #f39c12, #e67e22);
+        color: var(--white);
+    }
+    
+    .role-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+    
+    .role-badge.admin {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: var(--white);
+    }
+    
+    .role-badge.member {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: var(--white);
+    }
+    
+    /* View All Button */
+    .btn-view-all {
+        background: transparent;
+        border: 2px solid var(--primary-orange);
+        color: var(--primary-orange);
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .btn-view-all:hover {
+        background: var(--primary-orange);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 2rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 2rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .quick-actions-card {
+            padding: 1.5rem;
+        }
+        
+        .quick-actions-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-quick-action {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .section-body {
+            padding: 1.5rem;
+        }
+        
+        .custom-table {
+            font-size: 0.9rem;
+        }
+        
+        .custom-table thead th,
+        .custom-table tbody td {
+            padding: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="dashboard-icon">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <h1>Tableau de bord Administrateur</h1>
+            <p>Gérez votre plateforme MICI en toute simplicité</p>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card posts">
+            <div class="stat-icon">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_posts }}</div>
+            <div class="stat-label">Articles publiés</div>
+        </div>
+        
+        <div class="stat-card comments">
+            <div class="stat-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_comments }}</div>
+            <div class="stat-label">Commentaires</div>
+        </div>
+        
+        <div class="stat-card likes">
+            <div class="stat-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_likes }}</div>
+            <div class="stat-label">J'aime totaux</div>
+        </div>
+        
+        <div class="stat-card users">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Utilisateurs</div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions-card">
+        <h3 class="quick-actions-title">
+            <i class="fas fa-bolt"></i>
+            Actions rapides
+        </h3>
+        <div class="quick-actions-buttons">
+            <a href="{% url 'blog:post_create' %}" class="btn-quick-action">
+                <i class="fas fa-plus-circle"></i>
+                Créer un article
+            </a>
+            <a href="{% url 'admin:index' %}" class="btn-quick-action secondary">
+                <i class="fas fa-cog"></i>
+                Administration Django
+            </a>
+            {% if stats.pending_comments > 0 %}
+                <span class="pending-badge">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ stats.pending_comments }} commentaire{{ stats.pending_comments|pluralize }} en attente
+                </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Recent Posts -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-newspaper"></i>
+                Articles récents
+                <span class="section-count">{{ posts|length }}</span>
+            </h3>
+        </div>
+        <div class="section-body">
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Auteur</th>
+                            <th>Date</th>
+                            <th>J'aime</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'blog:post_detail' post.slug %}">
+                                        {{ post.title|truncatewords:8 }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ post.author.username }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ post.created_at|date:"d M Y" }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-heart" style="color: #e74c3c;"></i>
+                                    {{ post.get_likes_count }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'blog:post_edit' post.slug %}" class="btn-table-action btn-table-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'blog:post_delete' post.slug %}" 
+                                       class="btn-table-action btn-table-delete"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="table-empty">
+                                    <i class="fas fa-newspaper"></i>
+                                    <p>Aucun article publié pour le moment</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if posts %}
+                <div class="text-center mt-4">
+                    <a href="{% url 'blog:post_list' %}" class="btn-view-all">
+                        <i class="fas fa-th-list"></i>
+                        Voir tous les articles
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Recent Comments -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-comments"></i>
+                Commentaires récents
+                <span class="section-count">{{ comments|length }}</span>
+            </h3>
+        </div>
+        <div class="section-body">
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Article</th>
+                            <th>Utilisateur</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in comments %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'blog:post_detail' comment.post.slug %}">
+                                        {{ comment.post.title|truncatewords:6 }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ comment.user.username }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ comment.created_at|date:"d M Y" }}
+                                </td>
+                                <td>
+                                    {% if comment.approved %}
+                                        <span class="status-badge approved">
+                                            <i class="fas fa-check-circle"></i> Approuvé
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge pending">
+                                            <i class="fas fa-clock"></i> En attente
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'blog:comment_delete' comment.id %}" 
+                                       class="btn-table-action btn-table-delete"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="table-empty">
+                                    <i class="fas fa-comments"></i>
+                                    <p>Aucun commentaire pour le moment</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Users -->
+    <div class="section-card">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-users"></i>
+                Utilisateurs récents
+                <span class="section-count">{{ users|length }}</span>
+            </h3>
+        </div>
+        <div class="section-body">
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Nom d'utilisateur</th>
+                            <th>Email</th>
+                            <th>Rôle</th>
+                            <th>Date d'inscription</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-user-circle"></i>
+                                    {{ user.username }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-envelope"></i>
+                                    {{ user.email }}
+                                </td>
+                                <td>
+                                    {% if user.is_admin_user %}
+                                        <span class="role-badge admin">
+                                            <i class="fas fa-crown"></i> Admin
+                                        </span>
+                                    {% else %}
+                                        <span class="role-badge member">
+                                            <i class="fas fa-user"></i> Membre
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-plus"></i>
+                                    {{ user.created_at|date:"d M Y" }}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="table-empty">
+                                    <i class="fas fa-users"></i>
+                                    <p>Aucun utilisateur enregistré</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate stats on page load
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        const animateValue = (element, start, end, duration) => {
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 16);
+        };
+        
+        statNumbers.forEach((stat, index) => {
+            const endValue = parseInt(stat.textContent);
+            setTimeout(() => {
+                animateValue(stat, 0, endValue, 1500);
+            }, index * 100);
+        });
+        
+        // Add confirmation for delete actions
+        document.querySelectorAll('.btn-table-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const confirmed = confirm(this.getAttribute('onclick')?.includes('confirm') ? '' : 'Êtes-vous sûr de vouloir supprimer cet élément ?');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

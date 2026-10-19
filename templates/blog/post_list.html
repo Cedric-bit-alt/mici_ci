@@ -1,0 +1,748 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog - MICI | Tous les Articles{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0 0 30px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 140, 66, 0.1), transparent);
+        border-radius: 50%;
+    }
+    
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .page-header p {
+        font-size: 1.2rem;
+        color: var(--text-medium);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .page-header-icon {
+        font-size: 2.5rem;
+        color: var(--primary-orange);
+        margin-bottom: 1rem;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    /* Search Bar */
+    .search-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        margin-bottom: 3rem;
+        overflow: hidden;
+        background: var(--white);
+        transition: var(--transition);
+    }
+    
+    .search-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .search-card-body {
+        padding: 2rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+    
+    .search-input-wrapper {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.2rem 1rem 3rem;
+        border: 2px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: var(--white);
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-orange);
+        box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 1.1rem;
+    }
+    
+    .search-input:focus + .search-icon {
+        color: var(--primary-orange);
+    }
+    
+    .btn-search {
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        border: none;
+        color: var(--white);
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+        transition: var(--transition);
+        white-space: nowrap;
+    }
+    
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+        background: linear-gradient(135deg, var(--dark-orange), var(--primary-orange));
+    }
+    
+    .btn-clear {
+        padding: 1rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        background: var(--white);
+        border: 2px solid var(--border-color);
+        color: var(--text-dark);
+        transition: var(--transition);
+    }
+    
+    .btn-clear:hover {
+        background: var(--light-gray);
+        border-color: var(--text-light);
+        transform: translateY(-2px);
+    }
+    
+    /* Results Info */
+    .results-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(144, 198, 149, 0.05));
+        border-radius: 15px;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .results-count {
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .results-count i {
+        color: var(--primary-green);
+        margin-right: 0.5rem;
+    }
+    
+    .search-query {
+        color: var(--primary-orange);
+        font-weight: 700;
+    }
+    
+    /* Blog Card */
+    .blog-card {
+        height: 100%;
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--white);
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .blog-card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 260px;
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+    }
+    
+    .blog-card-img-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 1;
+    }
+    
+    .blog-card:hover .blog-card-img-wrapper::before {
+        opacity: 1;
+    }
+    
+    .blog-card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+    
+    .blog-card:hover .blog-card-img {
+        transform: scale(1.15) rotate(2deg);
+    }
+    
+    .blog-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .blog-card-body {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .blog-card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.3s;
+    }
+    
+    .blog-card:hover .blog-card-title {
+        color: var(--primary-orange);
+    }
+    
+    .blog-card-text {
+        color: var(--text-medium);
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .blog-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        padding: 1.2rem 0;
+        border-top: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .blog-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--text-light);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .blog-meta-item i {
+        color: var(--primary-green);
+        font-size: 1rem;
+    }
+    
+    .blog-meta-item:hover {
+        color: var(--primary-orange);
+    }
+    
+    .btn-read-article {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        border: none;
+        padding: 0.9rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+        margin-top: auto;
+    }
+    
+    .btn-read-article:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+        background: linear-gradient(135deg, var(--dark-orange), var(--primary-orange));
+        color: var(--white);
+    }
+    
+    .btn-read-article i {
+        transition: transform 0.3s;
+    }
+    
+    .btn-read-article:hover i {
+        transform: translateX(4px);
+    }
+    
+    /* Pagination */
+    .pagination-wrapper {
+        margin-top: 4rem;
+        padding: 2rem 0;
+    }
+    
+    .pagination {
+        gap: 0.5rem;
+    }
+    
+    .page-item .page-link {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.8rem 1.3rem;
+        color: var(--text-dark);
+        font-weight: 600;
+        transition: var(--transition);
+        margin: 0;
+    }
+    
+    .page-item .page-link:hover {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        border-color: var(--primary-orange);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        border-color: var(--primary-orange);
+        color: var(--white);
+        box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+    }
+    
+    .page-item.disabled .page-link {
+        background: var(--light-gray);
+        border-color: var(--border-color);
+        color: var(--text-light);
+    }
+    
+    /* Empty State */
+    .no-results {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.05), rgba(144, 198, 149, 0.05));
+        border-radius: 20px;
+        margin: 3rem 0;
+    }
+    
+    .no-results-icon {
+        font-size: 6rem;
+        color: var(--primary-orange);
+        opacity: 0.3;
+        margin-bottom: 2rem;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+    
+    .no-results h3 {
+        color: var(--text-dark);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    
+    .no-results p {
+        color: var(--text-medium);
+        font-size: 1.2rem;
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+    
+    .no-results .search-query {
+        display: block;
+        font-size: 1.5rem;
+        color: var(--primary-orange);
+        font-weight: 700;
+        margin: 1rem 0;
+    }
+    
+    /* Loading Animation */
+    .loading-skeleton {
+        animation: shimmer 1.5s infinite;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 2.2rem;
+        }
+        
+        .page-header p {
+            font-size: 1rem;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-input-wrapper {
+            min-width: 100%;
+        }
+        
+        .btn-search,
+        .btn-clear {
+            width: 100%;
+        }
+        
+        .results-info {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .blog-card-img-wrapper {
+            height: 220px;
+        }
+        
+        .blog-meta {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .page-header {
+            padding: 2rem 0;
+        }
+        
+        .search-card-body {
+            padding: 1.5rem;
+        }
+        
+        .blog-card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <div class="page-header-content">
+            <div class="page-header-icon">
+                <i class="fas fa-blog"></i>
+            </div>
+            <h1>Blog MICI</h1>
+            <p>Découvrez tous nos articles de foi, de prière et de réflexion spirituelle</p>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Search Bar -->
+    <div class="search-card">
+        <div class="search-card-body">
+            <form method="get" action="{% url 'blog:post_list' %}" class="search-form">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        name="q" 
+                        placeholder="Rechercher un article par titre, contenu, auteur..." 
+                        value="{{ query }}"
+                        aria-label="Rechercher un article"
+                    >
+                </div>
+                <button class="btn btn-search" type="submit">
+                    <i class="fas fa-search"></i> Rechercher
+                </button>
+                {% if query %}
+                    <a href="{% url 'blog:post_list' %}" class="btn btn-clear">
+                        <i class="fas fa-times"></i> Effacer
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results Info -->
+    {% if page_obj %}
+        <div class="results-info">
+            <div class="results-count">
+                <i class="fas fa-book-open"></i>
+                {% if query %}
+                    {{ page_obj.paginator.count }} résultat{{ page_obj.paginator.count|pluralize }} pour 
+                    <span class="search-query">"{{ query }}"</span>
+                {% else %}
+                    {{ page_obj.paginator.count }} article{{ page_obj.paginator.count|pluralize }} au total
+                {% endif %}
+            </div>
+            <div class="results-pages">
+                <small class="text-muted">
+                    Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                </small>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Blog Posts Grid -->
+    {% if page_obj %}
+        <div class="row">
+            {% for post in page_obj %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <article class="blog-card">
+                        <div class="blog-card-img-wrapper">
+                            {% if post.image %}
+                                <img src="{{ post.image.url }}" class="blog-card-img" alt="{{ post.title }}">
+                            {% else %}
+                                <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800" 
+                                     class="blog-card-img" alt="{{ post.title }}">
+                            {% endif %}
+                            <span class="blog-badge">
+                                <i class="fas fa-bookmark"></i> Nouveau
+                            </span>
+                        </div>
+                        <div class="blog-card-body">
+                            <h2 class="blog-card-title">{{ post.title }}</h2>
+                            <p class="blog-card-text">{{ post.content|truncatewords_html:20|striptags }}</p>
+                            
+                            <div class="blog-meta">
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ post.author.username }}</span>
+                                </div>
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ post.created_at|date:"d M Y" }}</span>
+                                </div>
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-heart"></i>
+                                    <span>{{ post.get_likes_count }} J'aime</span>
+                                </div>
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-comments"></i>
+                                    <span>{{ post.comments.count }} Commentaire{{ post.comments.count|pluralize }}</span>
+                                </div>
+                            </div>
+                            
+                            <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-read-article">
+                                Lire l'article
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Navigation des pages" class="pagination-wrapper">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}" aria-label="Première page">
+                                <i class="fas fa-angle-double-left"></i> Premier
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Page précédente">
+                                <i class="fas fa-angle-left"></i> Précédent
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <i class="fas fa-angle-double-left"></i> Premier
+                            </span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                <i class="fas fa-angle-left"></i> Précédent
+                            </span>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            <i class="fas fa-book"></i> Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Page suivante">
+                                Suivant <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" aria-label="Dernière page">
+                                Dernier <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                Suivant <i class="fas fa-angle-right"></i>
+                            </span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">
+                                Dernier <i class="fas fa-angle-double-right"></i>
+                            </span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <!-- No Results -->
+        <div class="no-results">
+            <div class="no-results-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Aucun article trouvé</h3>
+            {% if query %}
+                <p>
+                    Nous n'avons trouvé aucun résultat pour 
+                    <span class="search-query">"{{ query }}"</span>
+                </p>
+                <p>Essayez avec d'autres mots-clés ou explorez tous nos articles.</p>
+                <a href="{% url 'blog:post_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-th-list"></i> Voir tous les articles
+                </a>
+            {% else %}
+                <p>Aucun article n'a encore été publié. Revenez bientôt pour découvrir nos contenus !</p>
+                {% if user.is_authenticated and user.is_admin_user %}
+                    <a href="{% url 'blog:post_create' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus-circle"></i> Créer le premier article
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search input auto-focus on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('.search-input');
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Focus on search if query exists
+        if (urlParams.has('q')) {
+            searchInput.focus();
+            searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+        }
+        
+        // Clear search shortcut (Escape key)
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && this.value) {
+                window.location.href = '{% url "blog:post_list" %}';
+            }
+        });
+        
+        // Search form validation
+        const searchForm = document.querySelector('.search-form');
+        searchForm.addEventListener('submit', function(e) {
+            const query = searchInput.value.trim();
+            if (!query) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+    });
+    
+    // Smooth scroll to results after search
+    if (window.location.search.includes('q=')) {
+        setTimeout(() => {
+            const resultsInfo = document.querySelector('.results-info');
+            if (resultsInfo) {
+                resultsInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    }
+    
+    // Add loading animation to cards
+    document.querySelectorAll('.blog-card-img').forEach(img => {
+        if (!img.complete) {
+            img.style.opacity = '0';
+            img.addEventListener('load', function() {
+                this.style.transition = 'opacity 0.5s ease';
+                this.style.opacity = '1';
+            });
+        }
+    });
+</script>
+{% endblock %}
