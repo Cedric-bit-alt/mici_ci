@@ -1,0 +1,47 @@
+{% with url_name=request.resolver_match.url_name %}
+<div class="shop-menu border-bottom bg-white shadow-sm">
+    <div class="container">
+        <ul class="nav nav-pills py-2 gap-1 flex-wrap">
+            {% if not user.is_admin_user %}
+            <li class="nav-item">
+                <a class="nav-link {% if url_name == 'product_list' or url_name == 'product_detail' %}active{% endif %}" href="{% url 'shop:product_list' %}">
+                    <i class="fas fa-store"></i> Articles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if url_name == 'cart_detail' or url_name == 'checkout' %}active{% endif %}" href="{% url 'shop:cart_detail' %}">
+                    <i class="fas fa-shopping-cart"></i> Panier
+                    {% if cart_count %}<span class="badge rounded-pill bg-success ms-1">{{ cart_count }}</span>{% endif %}
+                </a>
+            </li>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {% if user.is_admin_user %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if url_name == 'product_create' %}active{% endif %}" href="{% url 'shop:product_create' %}">
+                            <i class="fas fa-plus-circle"></i> Ajouter un article
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if url_name == 'admin_order_list' %}active{% endif %}" href="{% url 'shop:admin_order_list' %}">
+                            <i class="fas fa-clipboard-list"></i> Commandes clients
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if url_name == 'order_list' or url_name == 'order_detail' %}active{% endif %}" href="{% url 'shop:order_list' %}">
+                            <i class="fas fa-receipt"></i> Mes commandes
+                        </a>
+                    </li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<style>
+    .shop-menu .nav-link { color: var(--text-dark); font-weight: 500; border-radius: 10px; }
+    .shop-menu .nav-link:hover { background: rgba(255, 140, 66, 0.08); color: var(--primary-orange); }
+    .shop-menu .nav-link.active { background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange)); color: #fff; }
+    .shop-menu .nav-link.active .badge { background: #fff !important; color: var(--dark-orange); }
+</style>
+{% endwith %}

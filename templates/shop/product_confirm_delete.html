@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer l'article - Boutique MICI{% endblock %}
+
+{% block content %}
+{% include 'shop/_menu.html' %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Supprimer l'article</h2>
+
+                    <div class="alert alert-warning">
+                        <p>Êtes-vous sûr de vouloir supprimer <strong>« {{ product.name }} »</strong> de la boutique ?</p>
+                        <p class="mb-0">Cette action est irréversible.</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

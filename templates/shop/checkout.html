@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Valider ma commande - Boutique MICI{% endblock %}
+
+{% block content %}
+{% include 'shop/_menu.html' %}
+<div class="container mt-5 mb-5">
+    <h1 class="mb-4"><i class="fas fa-check-circle"></i> Valider ma commande</h1>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h4 class="mb-4">Coordonnées de livraison</h4>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="row">
+                            {% for field in form %}
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}<div class="text-danger small">{{ field.errors|join:' ' }}</div>{% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="alert alert-info small">
+                            <i class="fas fa-lock"></i> Vous serez redirigé vers <strong>CinetPay</strong> pour payer en toute sécurité
+                            (Orange Money, MTN, Moov, Wave, carte bancaire…).
+                        </div>
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <a href="{% url 'shop:cart_detail' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour au panier</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-credit-card"></i> Commander et payer {{ total|floatformat:"-2g" }} {{ shop_currency }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Récapitulatif</h4>
+                    <ul class="list-group list-group-flush">
+                        {% for item in items %}
+                            <li class="list-group-item d-flex justify-content-between px-0">
+                                <span>{{ item.quantity }} × {{ item.product.name }}</span>
+                                <span class="fw-semibold">{{ item.total_price|floatformat:"-2g" }} {{ shop_currency }}</span>
+                            </li>
+                        {% endfor %}
+                        <li class="list-group-item d-flex justify-content-between px-0 fs-5">
+                            <strong>Total</strong>
+                            <strong style="color: var(--primary-orange);">{{ total|floatformat:"-2g" }} {{ shop_currency }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

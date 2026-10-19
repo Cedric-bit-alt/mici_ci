@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Boutique MICI{% endblock %}
+
+{% block content %}
+{% include 'shop/_menu.html' %}
+<div class="container mt-5 mb-5">
+    <h1 class="mb-4"><i class="fas fa-receipt"></i> {{ title }}</h1>
+
+    {% if admin_view %}
+        <div class="d-flex gap-2 flex-wrap mb-4">
+            <a href="{% url 'shop:admin_order_list' %}" class="btn btn-sm {% if not current_status %}btn-primary{% else %}btn-outline-primary{% endif %}">Toutes</a>
+            {% for value, label in status_choices %}
+                <a href="?status={{ value }}" class="btn btn-sm {% if current_status == value %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ label }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if page_obj %}
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>N°</th>
+                                <th>Date</th>
+                                {% if admin_view %}<th>Client</th>{% endif %}
+                                <th class="text-end">Total</th>
+                                <th>Statut</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in page_obj %}
+                                <tr>
+                                    <td><strong>#{{ order.id }}</strong></td>
+                                    <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                                    {% if admin_view %}<td>{{ order.first_name }} {{ order.last_name }}<br><small class="text-muted">{{ order.phone }}</small></td>{% endif %}
+                                    <td class="text-end">{{ order.total|floatformat:"-2g" }} {{ shop_currency }}</td>
+                                    <td><span class="badge bg-{{ order.status_badge }}">{{ order.get_status_display }}</span></td>
+                                    <td class="text-end"><a href="{{ order.get_absolute_url }}" class="btn btn-sm btn-outline-primary">Voir</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <nav class="d-flex justify-content-center">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">&laquo;</a></li>
+                    {% endif %}
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">&raquo;</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">Aucune commande pour le moment.</div>
+        <a href="{% url 'shop:product_list' %}" class="btn btn-primary"><i class="fas fa-store"></i> Découvrir la boutique</a>
+    {% endif %}
+</div>
+{% endblock %}

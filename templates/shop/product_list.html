@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Boutique - MICI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .shop-header {
+        background: linear-gradient(135deg, rgba(255, 140, 66, 0.1), rgba(144, 198, 149, 0.1));
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0 0 30px 30px;
+        text-align: center;
+    }
+    .shop-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .product-card { height: 100%; display: flex; flex-direction: column; }
+    .product-card .card-body { display: flex; flex-direction: column; flex: 1; }
+    .product-img-placeholder {
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: var(--primary-green);
+        background: var(--light-gray);
+    }
+    .product-price {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary-orange);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include 'shop/_menu.html' %}
+<div class="shop-header">
+    <div class="container">
+        <h1><i class="fas fa-store"></i> Boutique</h1>
+        <p class="text-muted mb-4">Articles religieux : chapelets, croix, livres, médailles…</p>
+        <form method="get" class="d-flex justify-content-center gap-2 flex-wrap">
+            <input type="text" name="q" value="{{ query|default:'' }}" class="form-control" style="max-width: 400px;" placeholder="Rechercher un article...">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Rechercher</button>
+            {% if query %}<a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Effacer</a>{% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        {% for product in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card product-card">
+                    <a href="{{ product.get_absolute_url }}">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="product-img-placeholder"><i class="fas fa-cross"></i></div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-reset">{{ product.name }}</a>
+                        </h5>
+                        {% if not product.available %}
+                            <span class="badge bg-secondary mb-2">Indisponible (visible par les admins)</span>
+                        {% endif %}
+                        <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="product-price">{{ product.price|floatformat:"-2g" }} {{ shop_currency }}</span>
+                            {% if product.available and not user.is_admin_user %}
+                                <form method="post" action="{% url 'shop:cart_add' product.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-cart-plus"></i> Ajouter
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    {% if query %}Aucun article ne correspond à « {{ query }} ».{% else %}La boutique est vide pour le moment.{% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="d-flex justify-content-center">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}">&laquo;</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

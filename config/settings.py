@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'blog',
     'core',
+    'shop',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'shop.context_processors.cart',
             ],
         },
     },
@@ -163,4 +165,16 @@ AUTH_USER_MODEL = 'accounts.User'
 # Redirections après connexion/déconnexion
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
+LOGIN_URL = 'accounts:login'
+
+SHOP_CURRENCY = os.environ.get('SHOP_CURRENCY', 'FCFA')
+
+# CinetPay : identifiants du compte marchand (https://app.cinetpay.com)
+CINETPAY_API_KEY = os.environ.get('CINETPAY_API_KEY', '')
+CINETPAY_API_PASSWORD = os.environ.get('CINETPAY_API_PASSWORD', '')
+CINETPAY_ENV = os.environ.get('CINETPAY_ENV', 'sandbox')
+CINETPAY_CURRENCY = os.environ.get('CINETPAY_CURRENCY', 'XOF')
+
+# Vercel termine le HTTPS en amont : nécessaire pour les URLs absolues et la vérification CSRF
+if os.environ.get('VERCEL'):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
